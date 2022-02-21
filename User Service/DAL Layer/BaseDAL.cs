@@ -5,27 +5,32 @@ namespace DAL_Layer
 {
     public abstract class BaseDAL
     {
-        const string connectionString = "Data Source = (localdb)\\MSSQLLocalDB;Initial Catalog = \"User Service Database\"; Integrated Security = True; Connect Timeout = 30; Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+        public string ConnectionString { get; private set; }
 
-        protected DataTable runQuery(SqlCommand cmd)
+        protected BaseDAL(string connectionString)
         {
-            using (SqlConnection sqlConnection = new SqlConnection(connectionString)) 
+            ConnectionString = connectionString;
+        }
+
+        protected DataTable RunQuery(SqlCommand cmd)
+        {
+            using (SqlConnection sqlConnection = new(ConnectionString)) 
             {
                 cmd.Connection = sqlConnection;
                 sqlConnection.Open();
 
                 SqlDataReader dataReader = cmd.ExecuteReader();
 
-                DataTable dataTable = new DataTable();
+                DataTable dataTable = new();
                 dataTable.Load(dataReader);
                 
                 return dataTable;
             }
         }
 
-        protected int runNonQuery(SqlCommand cmd)
+        protected int RunNonQuery(SqlCommand cmd)
         {
-            using (SqlConnection sqlConnection = new SqlConnection(connectionString))
+            using (SqlConnection sqlConnection = new(ConnectionString))
             {
                 cmd.Connection = sqlConnection;
                 sqlConnection.Open();
@@ -33,9 +38,9 @@ namespace DAL_Layer
             }
         }
 
-        protected object runScalarQuery(SqlCommand cmd)
+        protected object RunScalarQuery(SqlCommand cmd)
         {
-            using (SqlConnection sqlConnection = new SqlConnection(connectionString))
+            using (SqlConnection sqlConnection = new(ConnectionString))
             {
                 cmd.Connection = sqlConnection;
                 sqlConnection.Open();
@@ -43,9 +48,9 @@ namespace DAL_Layer
             }
         }
 
-        protected SqlCommand commandBuilder(string baseQuery, params SqlParameter[] parameters)
+        protected static SqlCommand CommandBuilder(string baseQuery, params SqlParameter[] parameters)
         {
-            SqlCommand sqlCommand = new SqlCommand(baseQuery);
+            SqlCommand sqlCommand = new(baseQuery);
             foreach (SqlParameter sqlParameter in parameters)
             {
                 sqlCommand.Parameters.Add(sqlParameter);

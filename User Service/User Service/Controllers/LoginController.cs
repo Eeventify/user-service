@@ -10,16 +10,12 @@ namespace User_Service.Controllers
     [Route("[controller]")]
     public class LoginController : ControllerBase
     {
-        private readonly ILogger<LoginController> _logger;
-
         private readonly IUserCollection _userCollection;
                 
 
-        public LoginController(ILogger<LoginController> logger, IUserCollection? userCollection = null)
+        public LoginController(IUserCollection? userCollection = null)
         {
-            _logger = logger;
-
-            _userCollection = userCollection ?? IUserCollectionFactory.Get();
+             _userCollection = userCollection ?? IUserCollectionFactory.Get();
         }
 
 

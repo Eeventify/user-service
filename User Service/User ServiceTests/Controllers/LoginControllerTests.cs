@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿#pragma warning disable
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using DTO_Layer;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +16,7 @@ namespace User_Service.Controllers.Tests
         [TestInitialize()]
         public void Initialize()
         {
-            _loginController = new LoginController(null, new Mocks.MockUserDAL());
+            _loginController = new LoginController(new Mocks.MockUserDAL());
         }
 
         [TestMethod()]
