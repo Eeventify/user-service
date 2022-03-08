@@ -5,7 +5,7 @@ using System.Data.SqlClient;
 
 namespace DAL_Layer
 {
-    public class UserDAL : BaseDAL, IUserCollection, IUserRegistration
+    public class UserDAL : BaseDAL, IUserCollection, IUserRegistration, IIdentifierValidation
     {
         public UserDAL() : base("Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = \"User Service Database\"; Integrated Security = True; Connect Timeout = 30; Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False")
         {
@@ -15,9 +15,9 @@ namespace DAL_Layer
         {
             string query = "SELECT * FROM dbo.Users WHERE ID=@Id";
 
-            SqlParameter idParameter = new("@Id", SqlDbType.Int) { Value = Id };
+            SqlParameter idParam = new("@Id", SqlDbType.Int) { Value = Id };
 
-            SqlCommand cmd = BaseDAL.CommandBuilder(query, idParameter);
+            SqlCommand cmd = BaseDAL.CommandBuilder(query, idParam);
             DataTable dataTable = base.RunQuery(cmd);
 
             if (dataTable.Rows.Count == 0)
@@ -63,6 +63,9 @@ namespace DAL_Layer
             SqlParameter emailParameter = new("@Email", SqlDbType.VarChar, 50) { Value = email };
 
             SqlCommand cmd = BaseDAL.CommandBuilder(query, emailParameter);
+            SqlParameter emailParam = new("@Email", SqlDbType.VarChar, 50) { Value = email };
+
+            SqlCommand cmd = BaseDAL.CommandBuilder(query, emailParam);
             DataTable dataTable = base.RunQuery(cmd);
 
             if (dataTable.Rows.Count == 0)
@@ -91,5 +94,26 @@ namespace DAL_Layer
             SqlCommand cmd = BaseDAL.CommandBuilder(query, usernameParam, emailParam, passwordParam, regdateParam);
             return base.RunNonQuery(cmd) == 1;
         }        
+
+        public bool IsUsernameUnique(string username)
+        {
+            string qeury = "SELECT * FROM dbo.Users WHERE Username=@Username";
+
+            SqlParameter usernameParam = new("@Username", SqlDbType.VarChar, 50) { Value = username };
+            SqlCommand cmd = BaseDAL.CommandBuilder(qeury, usernameParam);
+
+            DataTable result = base.RunQuery(cmd);
+            return result.Rows.Count == 0;
+        }
+        public bool IsEmailUnique(string email) 
+        {
+            string qeury = "SELECT * FROM dbo.Users WHERE Email=@Email";
+
+            SqlParameter emailParam = new("@Email", SqlDbType.VarChar, 100) { Value = email };
+            SqlCommand cmd = BaseDAL.CommandBuilder(qeury, emailParam);
+            
+            DataTable result = base.RunQuery(cmd);
+            return result.Rows.Count == 0;
+        }
     }
 }
