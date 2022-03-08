@@ -38,14 +38,14 @@ namespace User_Service.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(User))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public IActionResult AttemptLogin(string username, string password)
+        public IActionResult AttemptLogin(string email, string password)
         {
-            if (username == null || password == null)
+            if (email == null || password == null)
             {
-                return BadRequest("No valid username and password were supplied");
+                return BadRequest("No valid email and password were supplied");
             }
 
-            UserDTO? user = _userCollection.GetUserByUsername(username);           
+            UserDTO? user = _userCollection.GetUserByEmail(email);           
 
             if (user != null && HashManager.CompareStringToHash(password, user.PasswordHash))
             {

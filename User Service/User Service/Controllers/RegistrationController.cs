@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Text.RegularExpressions;
 
 using Abstraction_Layer;
 using Factory_Layer;
+using DTO_Layer;
 
 namespace User_Service.Controllers
 {
@@ -11,39 +13,68 @@ namespace User_Service.Controllers
     {
 
         private readonly IUserRegistration _userRegistration;
-        private readonly IUserCollection _userCollection;
+        private readonly IIdentifierValidation _identifierValidation;
 
         public RegistrationController()
         {
-            _userCollection = IUserCollectionFactory.Get();
             _userRegistration = IUserRegistrationFactory.Get();
+            _identifierValidation = IIdentifierValidationFactory.Get();
         }
 
         [HttpGet]
-        public IActionResult Register(string username, string password, string? email = null)
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(UserDTO))]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult Register(string email, string username, string password)
         {
             if (!ValidateUsername(username))
             {
-                return Accepted("Username is already in use");
+                return Ok("Username contains illegal characters");
             }
 
             if (!ValidatePassword(password))
             {
-                return Accepted("Password is of incorrect format");
+                return Ok("Password contains illegal characters");
             }
 
-            _userRegistration.AddUser(new DTO_Layer.UserDTO() { Name = username, PasswordHash = HashManager.GetHash(password), Email = email});
-            throw new NotImplementedException();
+            if (!ValidateEmail(email))
+            {
+                return Ok("Invalid email was given");
+            }
+
+            if (!_identifierValidation.IsEmailUnique(email))
+            {
+                return Conflict("Email is already in use");
+            }
+
+            if (!_identifierValidation.IsUsernameUnique(username))
+            {
+                return Conflict("Username is already in use");
+            }            
+
+
+            UserDTO userDTO = new() { Name = username, PasswordHash = HashManager.GetHash(password), Email = email, RegistrationDate = DateTime.Now };
+            _userRegistration.AddUser(userDTO);
+            return Created("", userDTO);
         }
 
-        private bool ValidateUsername(string username)
+        // Helper Methods
+        private static bool ValidateUsername(string username)
         {
-            return _userCollection.GetUserByUsername(username) != null;
+            Regex regex = new("^(?=.{4,50}$)[a-zA-Z0-9_\\-]+$");
+            return regex.IsMatch(username);
+        }        
+
+        private static bool ValidatePassword(string password)
+        {
+            Regex regex = new("^(?=.{4,50}$)[a-zA-Z0-9!?@#$_&*\\-]+$");
+            return regex.IsMatch(password);
         }
 
-        private bool ValidatePassword(string password)
+        private static bool ValidateEmail(string email)
         {
-            throw new NotImplementedException();
+            Regex regex = new("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$");
+            return regex.IsMatch(email);
         }
     }
 }
