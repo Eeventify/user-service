@@ -32,5 +32,10 @@ namespace User_Service.Mocks
         {
             return users.Find(x => x.Name == username);
         }
+
+        public UserDTO? GetUserByEmail(string email)
+        {
+            return users.Find(x => x.Email == email);
+        }
     }
 }

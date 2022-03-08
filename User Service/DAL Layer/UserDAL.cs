@@ -38,9 +38,31 @@ namespace DAL_Layer
         {
             string query = "SELECT * FROM dbo.Users WHERE Username=@Username";
 
-            SqlParameter idParameter = new("@Username", SqlDbType.VarChar, 50) { Value = username };
+            SqlParameter usernameParameter = new("@Username", SqlDbType.VarChar, 50) { Value = username };
 
-            SqlCommand cmd = BaseDAL.CommandBuilder(query, idParameter);
+            SqlCommand cmd = BaseDAL.CommandBuilder(query, usernameParameter);
+            DataTable dataTable = base.RunQuery(cmd);
+
+            if (dataTable.Rows.Count == 0)
+            {
+                return null;
+            }
+            return new UserDTO
+            {
+                Id = (int)dataTable.Rows[0]["Id"],
+                Name = (string)dataTable.Rows[0]["Username"],
+                Email = (string)dataTable.Rows[0]["Email"],
+                PasswordHash = (string)dataTable.Rows[0]["PasswordHash"],
+                RegistrationDate = (DateTime)dataTable.Rows[0]["RegistrationDate"]
+            };
+        }
+
+        public UserDTO? GetUserByEmail(string email)
+        {
+            string query = "SELECT* FROM dbo.Users WHERE Email = @Email";
+            SqlParameter emailParameter = new("@Email", SqlDbType.VarChar, 50) { Value = email };
+
+            SqlCommand cmd = BaseDAL.CommandBuilder(query, emailParameter);
             DataTable dataTable = base.RunQuery(cmd);
 
             if (dataTable.Rows.Count == 0)
@@ -68,6 +90,6 @@ namespace DAL_Layer
 
             SqlCommand cmd = BaseDAL.CommandBuilder(query, usernameParam, emailParam, passwordParam, regdateParam);
             return base.RunNonQuery(cmd) == 1;
-        }
+        }        
     }
 }
