@@ -11,7 +11,6 @@ namespace Abstraction_Layer
     public interface IUserCollection
     {
         public UserDTO? GetUser(int Id);
-        public UserDTO? GetUserByUsername(string username);
         public UserDTO? GetUserByEmail(string email);
     }
 }

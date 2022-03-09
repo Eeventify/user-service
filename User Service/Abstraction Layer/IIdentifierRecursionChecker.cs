@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Abstraction_Layer
 {
-    public interface IIdentifierValidation
+    public interface IIdentifierRecursionChecker
     {
-        public bool IsUsernameUnique(string username);
         public bool IsEmailUnique(string email);
+        public bool IsUsernameUnique(string username);
     }
 }

@@ -12,12 +12,16 @@ namespace User_Service.Controllers
     {
         private readonly IUserCollection _userCollection;
         private readonly IUserRegistration _userRegistration;
+        private readonly IIdentifierRecursionChecker _identifierRecursionChecker;
+        private readonly IIdentifierValidator _identifierValidator;
 
 
-        public LoginController(IUserCollection? userCollection = null, IUserRegistration? userRegistration = null)
+        public LoginController(IUserCollection? userCollection = null, IUserRegistration? userRegistration = null, IIdentifierRecursionChecker? identifierRecursionChecker = null, IIdentifierValidator? identifierValidator = null)
         {
             _userCollection = userCollection ?? IUserCollectionFactory.Get();
             _userRegistration = userRegistration ?? IUserRegistrationFactory.Get();
+            _identifierRecursionChecker = identifierRecursionChecker ?? IIdentifierRecursionCheckerFactory.Get(); 
+            _identifierValidator = identifierValidator ?? new RegexValidator();
         }
 
         /// <summary>
@@ -26,7 +30,7 @@ namespace User_Service.Controllers
         /// <remarks>
         /// Attempt a login with given user authentification
         /// </remarks>
-        /// <param name="username">The username for attempted login</param>
+        /// <param name="email">The email for attempted login</param>
         /// <param name="password">The password for attempted login</param>
         /// <response code="200">The login details are correct and an identification token will be returned</response>
         /// <response code="400">The given input was invalid</response>
@@ -68,40 +72,35 @@ namespace User_Service.Controllers
         [Route("Register")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
-        public IActionResult Register(string username, string password, string email)
+        public IActionResult Register(string email, string username, string password)
         {
-            if (!ValidateUsername(username))
+            if (!_identifierValidator.Username(username))
             {
-                return Accepted("Username is already in use");
+                return Accepted("Username contains illegal characters");
             }
 
-            if (!ValidateEmail(email))
+            if (!_identifierValidator.Email(email))
+            {
+                return Accepted("Email contains illegal characters");
+            }
+
+            if (!_identifierValidator.Password(password))
+            {
+                return Accepted("Password contains illegal characters");
+            }
+
+            if (!_identifierRecursionChecker.IsEmailUnique(email))
             {
                 return Accepted("Email is already in use");
             }
 
-            if (!ValidatePassword(password))
+            if (!_identifierRecursionChecker.IsUsernameUnique(username))
             {
-                return Accepted("Password is of incorrect format");
+                return Accepted("Username is already in use");
             }
 
             _userRegistration.AddUser(new DTO_Layer.UserDTO() { Name = username, PasswordHash = HashManager.GetHash(password), Email = email });
             return Ok();
-        }
-
-        private bool ValidateUsername(string username)
-        {
-            return _userCollection.GetUserByUsername(username) != null;
-        }
-
-        private bool ValidateEmail(string email)
-        {
-            return _userCollection.GetUserByEmail(email) != null;
-        }
-
-        private bool ValidatePassword(string password)
-        {
-            throw new NotImplementedException();
         }
     }
 }

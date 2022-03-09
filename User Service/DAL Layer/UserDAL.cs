@@ -5,10 +5,11 @@ using System.Data.SqlClient;
 
 namespace DAL_Layer
 {
-    public class UserDAL : BaseDAL, IUserCollection, IUserRegistration, IIdentifierValidation
+    public class UserDAL : BaseDAL, IUserCollection, IUserRegistration, IIdentifierRecursionChecker
     {
-        public UserDAL() : base("Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = \"User Service Database\"; Integrated Security = True; Connect Timeout = 30; Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False")
+        public UserDAL() : base("Data Source = (localdb)\\MSSQLLocalDB;Initial Catalog = User_Service; Integrated Security = True; Connect Timeout = 30; Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False")
         {
+
         }
 
         public UserDTO? GetUser(int Id)
@@ -34,35 +35,10 @@ namespace DAL_Layer
             };
         }
 
-        public UserDTO? GetUserByUsername(string username)
-        {
-            string query = "SELECT * FROM dbo.Users WHERE Username=@Username";
-
-            SqlParameter usernameParameter = new("@Username", SqlDbType.VarChar, 50) { Value = username };
-
-            SqlCommand cmd = BaseDAL.CommandBuilder(query, usernameParameter);
-            DataTable dataTable = base.RunQuery(cmd);
-
-            if (dataTable.Rows.Count == 0)
-            {
-                return null;
-            }
-            return new UserDTO
-            {
-                Id = (int)dataTable.Rows[0]["Id"],
-                Name = (string)dataTable.Rows[0]["Username"],
-                Email = (string)dataTable.Rows[0]["Email"],
-                PasswordHash = (string)dataTable.Rows[0]["PasswordHash"],
-                RegistrationDate = (DateTime)dataTable.Rows[0]["RegistrationDate"]
-            };
-        }
-
         public UserDTO? GetUserByEmail(string email)
         {
             string query = "SELECT* FROM dbo.Users WHERE Email = @Email";
-            SqlParameter emailParameter = new("@Email", SqlDbType.VarChar, 50) { Value = email };
-
-            SqlCommand cmd = BaseDAL.CommandBuilder(query, emailParameter);
+            
             SqlParameter emailParam = new("@Email", SqlDbType.VarChar, 50) { Value = email };
 
             SqlCommand cmd = BaseDAL.CommandBuilder(query, emailParam);
@@ -89,7 +65,7 @@ namespace DAL_Layer
             SqlParameter usernameParam = new("@Username", SqlDbType.VarChar, 50) { Value = userDTO.Name };
             SqlParameter emailParam = new("@Email", SqlDbType.VarChar, 100) { Value = userDTO.Email };
             SqlParameter passwordParam = new("@PasswordHash", SqlDbType.Char, 64) { Value = userDTO.PasswordHash };
-            SqlParameter regdateParam = new("@RegistrationDate", SqlDbType.Date) { Value = userDTO.RegistrationDate };
+            SqlParameter regdateParam = new("@RegistrationDate", SqlDbType.DateTime) { Value = DateTime.Now };
 
             SqlCommand cmd = BaseDAL.CommandBuilder(query, usernameParam, emailParam, passwordParam, regdateParam);
             return base.RunNonQuery(cmd) == 1;

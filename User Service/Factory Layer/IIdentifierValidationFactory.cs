@@ -3,9 +3,9 @@ using DAL_Layer;
 
 namespace Factory_Layer
 {
-    public static class IIdentifierValidationFactory
+    public static class IIdentifierRecursionCheckerFactory
     {
-        static public IIdentifierValidation Get()
+        static public IIdentifierRecursionChecker Get()
         {
             return new UserDAL();
         }

@@ -20,11 +20,11 @@ namespace User_Service.Controllers
         /// </remarks>
         /// <param name="id">ID for user that the authentification token is being requested for</param>
         /// <response code="200"></response>
-        /// <response code="4004"></response>
+        /// <response code="404"></response>
         [HttpGet]
         [Route("Request")]
         public IActionResult RequestToken(int id)
-        {
+        { 
             return Ok();
         }
     }
