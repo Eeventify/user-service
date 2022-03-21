@@ -108,9 +108,16 @@ namespace DAL_Layer
             return base.RunNonQuery(cmd) == 1;
         }     
         
-        public bool AddUserEFC()
+        public void AddUserEFC(UserDTO userDTO)
         {
-
+            User user = new User { Id = userDTO.Id, 
+                Name = userDTO.Name, 
+                Email = userDTO.Email, 
+                PasswordHash = userDTO.PasswordHash, 
+                RegistrationDate = userDTO.RegistrationDate };
+            using var db = new UserContext();
+            db.Add(user);
+            db.SaveChanges();
         }
 
         public bool IsUsernameUnique(string username)
@@ -123,6 +130,13 @@ namespace DAL_Layer
             DataTable result = base.RunQuery(cmd);
             return result.Rows.Count == 0;
         }
+
+        public bool IsUsernameUniqueEFC(string username)
+        {
+            using var db = new UserContext();
+            return db.Users.Any(s => s.Name == username);
+        }
+
         public bool IsEmailUnique(string email) 
         {
             string qeury = "SELECT * FROM dbo.Users WHERE Email=@Email";
@@ -132,6 +146,12 @@ namespace DAL_Layer
             
             DataTable result = base.RunQuery(cmd);
             return result.Rows.Count == 0;
+        }
+
+        public bool IsEmailUniqueEFC(string email)
+        {
+            using var db = new UserContext();
+            return db.Users.Any(s => s.Email == email);
         }
     }
 }
