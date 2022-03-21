@@ -7,7 +7,7 @@ namespace DAL_Layer
 {
     public class UserDAL : BaseDAL, IUserCollection, IUserRegistration, IIdentifierRecursionChecker
     {
-        public UserDAL() : base("Data Source = (localdb)\\MSSQLLocalDB;Initial Catalog = User_Service; Integrated Security = True; Connect Timeout = 30; Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False")
+        public UserDAL() : base(@"Server=db;Database=User Service;User=sa;Password=R9QgoT#Pm8;")
         {
 
         }
