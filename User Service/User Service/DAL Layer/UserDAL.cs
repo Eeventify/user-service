@@ -43,6 +43,7 @@ namespace DAL_Layer
             {
                 return null;
             }
+            //technisch gezien is de 'user' die hier wordt gelezen al een soort DTO, dus ik weet niet of het nodig is om het weer naar een ander DTO om te zetten
             return new UserDTO
             {
                 Id = (int)user.Id,
@@ -76,7 +77,23 @@ namespace DAL_Layer
             };
         }
 
-
+        public UserDTO? GetUserByEmailEFC(string email)
+        {
+            using var db = new UserContext();
+            User? user = db.Users.Where(s => s.Email == email).FirstOrDefault();
+            if (user == null)
+            {
+                return null;
+            }
+            return new UserDTO
+            {
+                Id = (int)user.Id,
+                Name = (string)user.Name,
+                Email = (string)user.Email,
+                PasswordHash = (string)user.PasswordHash,
+                RegistrationDate = (DateTime)user.RegistrationDate,
+            };
+        }
 
         public bool AddUser(UserDTO userDTO)
         {
@@ -89,7 +106,12 @@ namespace DAL_Layer
 
             SqlCommand cmd = BaseDAL.CommandBuilder(query, usernameParam, emailParam, passwordParam, regdateParam);
             return base.RunNonQuery(cmd) == 1;
-        }        
+        }     
+        
+        public bool AddUserEFC()
+        {
+
+        }
 
         public bool IsUsernameUnique(string username)
         {
