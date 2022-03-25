@@ -64,22 +64,18 @@ paths:
         - Login
       summary: Register User
       description: Register a new user account with given user information
-      parameters:
-        - name: email
-          in: query
-          description: The email for the created account
-          schema:
-            type: string
-        - name: username
-          in: query
-          description: The username for the created account
-          schema:
-            type: string
-        - name: password
-          in: query
-          description: The password for the created account
-          schema:
-            type: string
+      requestBody:
+        description: The user-information in the POST body for which to create an account
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserModel'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/UserModel'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/UserModel'
       responses:
         '200':
           description: The account was created. An authentification token is returned in the body
@@ -189,4 +185,17 @@ components:
         registrationDate:
           type: string
           format: date-time
+      additionalProperties: false
+    UserModel:
+      type: object
+      properties:
+        username:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        password:
+          type: string
+          nullable: true
       additionalProperties: false

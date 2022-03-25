@@ -6,6 +6,13 @@ using Factory_Layer;
 
 namespace User_Service.Controllers
 {
+    public class UserModel
+    {
+        public string Username { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+    }
+
     [ApiController]
     [Route("[controller]")]
     public class LoginController : ControllerBase
@@ -74,6 +81,7 @@ namespace User_Service.Controllers
         /// <remarks>
         /// Register a new user account with given user information
         /// </remarks>
+        /// <param name="user">The user-information in the POST body for which to create an account</param>
         /// <param name="username">The username for the created account</param>
         /// <param name="password">The password for the created account</param>
         /// <param name="email">The email for the created account</param>
@@ -83,35 +91,35 @@ namespace User_Service.Controllers
         [Route("Register")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
-        public IActionResult Register(string email, string username, string password)
+        public IActionResult Register(UserModel user /* string email, string username, string password */)
         {
-            if (!_identifierValidator.Username(username))
+            if (!_identifierValidator.Username(user.Username))
             {
                 return Accepted("Username contains illegal characters");
             }
 
-            if (!_identifierValidator.Email(email))
+            if (!_identifierValidator.Email(user.Email))
             {
                 return Accepted("Email contains illegal characters");
             }
 
-            if (!_identifierValidator.Password(password))
+            if (!_identifierValidator.Password(user.Password))
             {
                 return Accepted("Password contains illegal characters");
             }
 
-            if (!_identifierRecursionChecker.IsEmailUnique(email))
+            if (!_identifierRecursionChecker.IsEmailUnique(user.Email))
             {
                 return Accepted("Email is already in use");
             }
 
-            if (!_identifierRecursionChecker.IsUsernameUnique(username))
+            if (!_identifierRecursionChecker.IsUsernameUnique(user.Username))
             {
                 return Accepted("Username is already in use");
             }
 
-            int userID = _userRegistration.AddUser(new UserDTO() { Name = username, PasswordHash = HashManager.GetHash(password), Email = email });
-            string userKey = HashManager.GetHash(username + HashManager.GetHash(password));
+            int userID = _userRegistration.AddUser(new UserDTO() { Name = user.Username, PasswordHash = HashManager.GetHash(user.Password), Email = user.Email });
+            string userKey = HashManager.GetHash(user.Username + HashManager.GetHash(user.Password));
 
             Dictionary<string, object> data = new();
             data.Add("userID", userID);
