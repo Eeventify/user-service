@@ -6,44 +6,33 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;
 using System;
 
+using Abstraction_Layer;
+
 namespace User_Service.Controllers.Tests
 {
     [TestClass()]
     public class LoginControllerTests
     {
         private LoginController _loginController;
+        private Mocks.MockUserDAL _mockUserDAL;
 
         [TestInitialize()]
         public void Initialize()
         {
-            _loginController = new LoginController(new Mocks.MockUserDAL());
+            _mockUserDAL = new Mocks.MockUserDAL();
+            _loginController = new LoginController(_mockUserDAL);
         }
 
-        /*
-        [TestMethod()]
-        public void GetValidUserTest()
-        {
-            ObjectResult? result = _loginController.UserDetails(6) as OkObjectResult;
-            Assert.IsTrue(result != null && (result.Value as User).Name == "Test");
-        }
-
-        [TestMethod()]
-        public void GetInvalidUserTest()
-        {
-            ObjectResult? result = _loginController.UserDetails(-1) as BadRequestObjectResult;
-            Assert.IsTrue(result != null);
-        }
-        */
 
         [TestMethod()]
         public void AttemptValidLoginTest()
         {
-            ObjectResult? result = _loginController.AttemptLogin("Test", "6") as OkObjectResult;
-            Assert.IsTrue(result != null && (result.Value as User).Name == "Test");
+            ObjectResult? result = _loginController.AttemptLogin(_mockUserDAL.users[5].Email, "6") as OkObjectResult;
+            Assert.IsTrue(result != null);
         }
 
         [TestMethod()]
-        public void AttemptLoginWithUnknownUsernameTest()
+        public void AttemptLoginWithUnknownEmailTest()
         {
             ObjectResult? result = _loginController.AttemptLogin("Unknown", "6") as UnauthorizedObjectResult;
             Assert.IsTrue(result != null);
@@ -52,12 +41,12 @@ namespace User_Service.Controllers.Tests
         [TestMethod()]
         public void AttemptLoginWithWrongPasswordTest()
         {
-            ObjectResult? result = _loginController.AttemptLogin("Test", "Wrong") as UnauthorizedObjectResult;
+            ObjectResult? result = _loginController.AttemptLogin(_mockUserDAL.users[5].Email, "Wrong") as UnauthorizedObjectResult;
             Assert.IsTrue(result != null);
         }
 
         [TestMethod()]
-        public void AttemptLoginWithNullUsernameTest()
+        public void AttemptLoginWithNullEmailTest()
         {
             ObjectResult? result = _loginController.AttemptLogin(null, "6") as BadRequestObjectResult;
             Assert.IsTrue(result != null);

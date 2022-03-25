@@ -8,7 +8,7 @@ namespace User_Service.Mocks
 {
     public class MockUserDAL : IUserCollection
     {
-        readonly List<UserDTO> users;
+        public readonly List<UserDTO> users;
 
         public MockUserDAL()
         {

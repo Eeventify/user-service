@@ -14,14 +14,18 @@ namespace User_Service.Controllers
         private readonly IUserRegistration _userRegistration;
         private readonly IIdentifierRecursionChecker _identifierRecursionChecker;
         private readonly IIdentifierValidator _identifierValidator;
+        private readonly ITokenGenerator _tokenGenerator;
 
 
-        public LoginController(IUserCollection? userCollection = null, IUserRegistration? userRegistration = null, IIdentifierRecursionChecker? identifierRecursionChecker = null, IIdentifierValidator? identifierValidator = null)
+
+        public LoginController(IUserCollection? userCollection = null, IUserRegistration? userRegistration = null, IIdentifierRecursionChecker? identifierRecursionChecker = null, IIdentifierValidator? identifierValidator = null, ITokenGenerator? tokenGenerator = null)
         {
             _userCollection = userCollection ?? IUserCollectionFactory.Get();
             _userRegistration = userRegistration ?? IUserRegistrationFactory.Get();
             _identifierRecursionChecker = identifierRecursionChecker ?? IIdentifierRecursionCheckerFactory.Get(); 
             _identifierValidator = identifierValidator ?? new RegexValidator();
+
+            _tokenGenerator = tokenGenerator ?? new JWTGenerator("letmein", TimeSpan.FromDays(14).TotalSeconds);
         }
 
         /// <summary>
@@ -32,11 +36,11 @@ namespace User_Service.Controllers
         /// </remarks>
         /// <param name="email">The email for attempted login</param>
         /// <param name="password">The password for attempted login</param>
-        /// <response code="200">The login details are correct and an identification token will be returned</response>
+        /// <response code="200">The login details are correct and an JWT identification token will be returned</response>
         /// <response code="400">The given input was invalid</response>
         /// <response code="401">Invalid login-detail were given</response>        
-        [HttpGet]        
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(User))]
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public IActionResult AttemptLogin(string email, string password)
@@ -50,7 +54,14 @@ namespace User_Service.Controllers
 
             if (user != null && HashManager.CompareStringToHash(password, user.PasswordHash))
             {
-                return Ok(new User(user));
+                string userKey = HashManager.GetHash(user.Name + user.PasswordHash);
+
+                Dictionary<string, object> data = new();
+                data.Add("userID", user.Id);
+                data.Add("key", userKey);
+
+                string authToken = _tokenGenerator.Create(data);
+                return Ok(authToken);
             } else
             {
                 return Unauthorized("Username or password is incorrect");
@@ -68,7 +79,7 @@ namespace User_Service.Controllers
         /// <param name="email">The email for the created account</param>
         /// <response code="200">The account was created. An authentification token is returned in the body</response> 
         /// <response code="202">An input is invalid or of the wrong format. What specific input will be given in the body</response>
-        [HttpGet]
+        [HttpPost]
         [Route("Register")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
@@ -99,8 +110,15 @@ namespace User_Service.Controllers
                 return Accepted("Username is already in use");
             }
 
-            _userRegistration.AddUser(new DTO_Layer.UserDTO() { Name = username, PasswordHash = HashManager.GetHash(password), Email = email });
-            return Ok();
+            int userID = _userRegistration.AddUser(new UserDTO() { Name = username, PasswordHash = HashManager.GetHash(password), Email = email });
+            string userKey = HashManager.GetHash(username + HashManager.GetHash(password));
+
+            Dictionary<string, object> data = new();
+            data.Add("userID", userID);
+            data.Add("key", userKey);
+
+            string authToken = _tokenGenerator.Create(data);
+            return Ok(authToken);
         }
     }
 }
