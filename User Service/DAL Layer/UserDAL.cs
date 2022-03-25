@@ -58,9 +58,9 @@ namespace DAL_Layer
             };
         }
 
-        public bool AddUser(UserDTO userDTO)
+        public int AddUser(UserDTO userDTO)
         {
-            string query = "INSERT INTO dbo.Users VALUES (@Username, @Email, @PasswordHash, @RegistrationDate)";
+            string query = "INSERT INTO dbo.Users VALUES (@Username, @Email, @PasswordHash, @RegistrationDate) SELECT SCOPE_IDENTITY()";
 
             SqlParameter usernameParam = new("@Username", SqlDbType.VarChar, 50) { Value = userDTO.Name };
             SqlParameter emailParam = new("@Email", SqlDbType.VarChar, 100) { Value = userDTO.Email };
@@ -68,7 +68,7 @@ namespace DAL_Layer
             SqlParameter regdateParam = new("@RegistrationDate", SqlDbType.DateTime) { Value = DateTime.Now };
 
             SqlCommand cmd = BaseDAL.CommandBuilder(query, usernameParam, emailParam, passwordParam, regdateParam);
-            return base.RunNonQuery(cmd) == 1;
+            return Convert.ToInt32(base.RunScalarQuery(cmd));
         }        
 
         public bool IsUsernameUnique(string username)

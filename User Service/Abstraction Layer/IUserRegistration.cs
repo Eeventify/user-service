@@ -8,16 +8,8 @@ using DTO_Layer;
 
 namespace Abstraction_Layer
 {
-    public enum RegisterState
-    {
-        Success,
-        UsernameInUse,
-        EmailInUse,
-        PasswordInvalid
-    }
-
     public interface IUserRegistration
     {
-        public bool AddUser(UserDTO userDTO);
+        public int AddUser(UserDTO userDTO);
     }
 }
