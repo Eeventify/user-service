@@ -27,11 +27,11 @@ jobs:
       with:
         dotnet-version: 6.0.x
     - name: Restore dependencies
-      run: "./User Service/dotnet restore"
+      run: ./"User Service"/dotnet restore
     - name: Build
-      run: "./User Service/dotnet build --no-restore"
+      run: ./"User Service"/dotnet build --no-restore
     - name: Test
-      run: "./User Service/dotnet test --no-build --verbosity normal"
+      run: ./"User Service"/dotnet test --no-build --verbosity normal
 
   publish:
 
