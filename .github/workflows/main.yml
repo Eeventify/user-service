@@ -26,14 +26,12 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 6.0.x
-    - name: Move to right folder
-      run: cd "User Service"
     - name: Restore dependencies
-      run: dotnet restore
+      run: ./User Service/dotnet restore
     - name: Build
-      run: dotnet build --no-restore
+      run: ./User Service/dotnet build --no-restore
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: ./User Service/dotnet test --no-build --verbosity normal
 
   publish:
 
