@@ -1,17 +1,21 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 using Abstraction_Layer;
 using DTO_Layer;
 using Factory_Layer;
+using DAL_Layer;
 
 namespace User_Service.Controllers
 {
-    public class UserModel
+#pragma warning disable 8618
+    public class RegisterUser
     {
         public string Username { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
     }
+#pragma warning restore 8618
 
     [ApiController]
     [Route("[controller]")]
@@ -25,13 +29,13 @@ namespace User_Service.Controllers
 
 
 
-        public LoginController(IUserCollection? userCollection = null, IUserRegistration? userRegistration = null, IIdentifierRecursionChecker? identifierRecursionChecker = null, IIdentifierValidator? identifierValidator = null, ITokenGenerator? tokenGenerator = null)
+        public LoginController(UserContext userContext, IUserCollection? userCollection = null, IUserRegistration? userRegistration = null, IIdentifierRecursionChecker? identifierRecursionChecker = null, IIdentifierValidator? identifierValidator = null, ITokenGenerator? tokenGenerator = null)
         {
-            _userCollection = userCollection ?? IUserCollectionFactory.Get();
-            _userRegistration = userRegistration ?? IUserRegistrationFactory.Get();
-            _identifierRecursionChecker = identifierRecursionChecker ?? IIdentifierRecursionCheckerFactory.Get(); 
-            _identifierValidator = identifierValidator ?? new RegexValidator();
+            _userCollection = userCollection ?? IUserCollectionFactory.Get(userContext);
+            _userRegistration = userRegistration ?? IUserRegistrationFactory.Get(userContext);
+            _identifierRecursionChecker = identifierRecursionChecker ?? IIdentifierRecursionCheckerFactory.Get(userContext);
 
+            _identifierValidator = identifierValidator ?? new RegexValidator();
             _tokenGenerator = tokenGenerator ?? new JWTGenerator("letmein", TimeSpan.FromDays(14).TotalSeconds);
         }
 
@@ -61,7 +65,7 @@ namespace User_Service.Controllers
 
             if (user != null && HashManager.CompareStringToHash(password, user.PasswordHash))
             {
-                string userKey = HashManager.GetHash(user.Name + user.PasswordHash);
+                string userKey = HashManager.GetHash(user.Username + user.PasswordHash);
 
                 Dictionary<string, object> data = new();
                 data.Add("userID", user.Id);
@@ -82,16 +86,13 @@ namespace User_Service.Controllers
         /// Register a new user account with given user information
         /// </remarks>
         /// <param name="user">The user-information in the POST body for which to create an account</param>
-        /// <param name="username">The username for the created account</param>
-        /// <param name="password">The password for the created account</param>
-        /// <param name="email">The email for the created account</param>
         /// <response code="200">The account was created. An authentification token is returned in the body</response> 
         /// <response code="202">An input is invalid or of the wrong format. What specific input will be given in the body</response>
         [HttpPost]
         [Route("Register")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
-        public IActionResult Register(UserModel user /* string email, string username, string password */)
+        public IActionResult Register(RegisterUser user)
         {
             if (!_identifierValidator.Username(user.Username))
             {
@@ -118,7 +119,7 @@ namespace User_Service.Controllers
                 return Accepted("Username is already in use");
             }
 
-            int userID = _userRegistration.AddUser(new UserDTO() { Name = user.Username, PasswordHash = HashManager.GetHash(user.Password), Email = user.Email });
+            int userID = _userRegistration.AddUser(new UserDTO() { Username = user.Username, PasswordHash = HashManager.GetHash(user.Password), Email = user.Email });
             string userKey = HashManager.GetHash(user.Username + HashManager.GetHash(user.Password));
 
             Dictionary<string, object> data = new();

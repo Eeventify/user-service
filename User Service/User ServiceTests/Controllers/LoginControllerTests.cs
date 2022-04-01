@@ -20,7 +20,7 @@ namespace User_Service.Controllers.Tests
         public void Initialize()
         {
             _mockUserDAL = new Mocks.MockUserDAL();
-            _loginController = new LoginController(_mockUserDAL);
+            _loginController = new LoginController(null, _mockUserDAL);
         }
 
 

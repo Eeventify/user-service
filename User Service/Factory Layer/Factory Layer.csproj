@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Abstraction Layer\Abstraction Layer.csproj" />
     <ProjectReference Include="..\DAL Layer\DAL Layer.csproj" />
   </ItemGroup>

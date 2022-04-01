@@ -69,13 +69,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserModel'
+              $ref: '#/components/schemas/RegisterUser'
           text/json:
             schema:
-              $ref: '#/components/schemas/UserModel'
+              $ref: '#/components/schemas/RegisterUser'
           application/*+json:
             schema:
-              $ref: '#/components/schemas/UserModel'
+              $ref: '#/components/schemas/RegisterUser'
       responses:
         '200':
           description: The account was created. An authentification token is returned in the body
@@ -170,6 +170,19 @@ components:
           type: string
           nullable: true
       additionalProperties: { }
+    RegisterUser:
+      type: object
+      properties:
+        username:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        password:
+          type: string
+          nullable: true
+      additionalProperties: false
     User:
       type: object
       properties:
@@ -185,17 +198,4 @@ components:
         registrationDate:
           type: string
           format: date-time
-      additionalProperties: false
-    UserModel:
-      type: object
-      properties:
-        username:
-          type: string
-          nullable: true
-        email:
-          type: string
-          nullable: true
-        password:
-          type: string
-          nullable: true
       additionalProperties: false
