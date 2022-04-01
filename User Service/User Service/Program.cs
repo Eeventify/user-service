@@ -17,6 +17,7 @@ builder.Services.AddDbContext<UserContext>(opt =>
 });
 
 
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options => { 
@@ -38,16 +39,22 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+} else
+{
+    try
+    {
+        //app.UseExceptionHandler("/Home/Error");
+
+        using (IServiceScope serviceScope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
+        {
+            serviceScope.ServiceProvider.GetRequiredService<UserContext>().Database.Migrate();
+        }
+    }
+    catch { }
 }
 
-if (app.Environment.IsProduction())
-{
-    using (IServiceScope serviceScope = app.Services.GetService<IServiceScopeFactory>().CreateScope())
-    {
-        DbContext context = serviceScope.ServiceProvider.GetRequiredService<UserContext>();
-        context.Database.Migrate();
-    }
-}
+
+
 
 app.UseAuthorization();
 
