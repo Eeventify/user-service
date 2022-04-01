@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 using Abstraction_Layer;
 using DTO_Layer;
 using Factory_Layer;
+
+using UserContext = DAL_Layer.UserContext;
 
 namespace User_Service.Controllers
 {
@@ -13,9 +16,9 @@ namespace User_Service.Controllers
         private readonly IUserCollection _userCollection;
 
 
-        public UserController(IUserCollection? userCollection = null)
+        public UserController(UserContext context, IUserCollection? userCollection = null)
         {
-            _userCollection = userCollection ?? IUserCollectionFactory.Get();
+            _userCollection = userCollection ?? IUserCollectionFactory.Get(context);
         }
 
         /// <summary>
@@ -33,13 +36,13 @@ namespace User_Service.Controllers
         [Route("Details")]
         public IActionResult UserDetails(int Id)
         {
-            UserDTO? userDTO = _userCollection.GetUser(Id);
+            UserDTO? userModel = _userCollection.GetUser(Id);
 
-            if (userDTO == null)
+            if (userModel == null)
             {
                 return BadRequest("A user with this ID does not exist");
             }
-            return Ok(new User(userDTO));
+            return Ok(new User(userModel));
         }
     }
 }

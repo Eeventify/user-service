@@ -1,11 +1,23 @@
+#pragma warning disable CS8602
+
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
+
+using DAL_Layer;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddDbContext<UserContext>(opt =>
+{
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("UserContextLive"));
+});
+
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options => { 
@@ -27,7 +39,22 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+} else
+{
+    try
+    {
+        //app.UseExceptionHandler("/Home/Error");
+
+        using (IServiceScope serviceScope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
+        {
+            serviceScope.ServiceProvider.GetRequiredService<UserContext>().Database.Migrate();
+        }
+    }
+    catch { }
 }
+
+
+
 
 app.UseAuthorization();
 

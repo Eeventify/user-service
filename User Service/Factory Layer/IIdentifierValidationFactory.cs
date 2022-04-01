@@ -1,14 +1,16 @@
-﻿using Abstraction_Layer;
+﻿using Microsoft.EntityFrameworkCore;
+
+using Abstraction_Layer;
 using DAL_Layer;
+
 
 namespace Factory_Layer
 {
     public static class IIdentifierRecursionCheckerFactory
     {
-        static public IIdentifierRecursionChecker Get()
+        static public IIdentifierRecursionChecker Get(DbContext context)
         {
-            return new UserDAL();
+            return new UserEFDAL(context);
         }
-
     }
 }
