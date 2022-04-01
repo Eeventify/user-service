@@ -40,7 +40,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-if (!app.Environment.IsDevelopment() && !app.Environment.IsStaging())
+if (app.Environment.IsProduction())
 {
     using (IServiceScope serviceScope = app.Services.GetService<IServiceScopeFactory>().CreateScope())
     {
