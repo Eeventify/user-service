@@ -21,7 +21,7 @@ namespace User_Service
         public User(UserDTO userDTO)
         {
             Id = userDTO.Id;
-            Name = userDTO.Name;
+            Name = userDTO.Username;
             Email = userDTO.Email;
             RegistrationDate = userDTO.RegistrationDate;
         }
