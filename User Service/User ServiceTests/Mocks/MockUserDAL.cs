@@ -8,7 +8,7 @@ using DTO_Layer;
 
 namespace User_Service.Mocks
 {
-    public class MockUserDAL : IUserCollection
+    public class MockUserDAL : IUserCollection, IUserRegistration, IIdentifierRecursionChecker
     {
         public readonly List<UserDTO> users;
 
@@ -39,5 +39,9 @@ namespace User_Service.Mocks
         {
             return users.Find(x => x.Email == email);
         }
+
+        public int AddUser(UserDTO userDTO) => throw new System.NotImplementedException();
+        public bool IsEmailUnique(string email) => throw new System.NotImplementedException();
+        public bool IsUsernameUnique(string username) => throw new System.NotImplementedException();
     }
 }

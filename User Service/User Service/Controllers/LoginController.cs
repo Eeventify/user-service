@@ -29,7 +29,7 @@ namespace User_Service.Controllers
 
 
 
-        public LoginController(UserContext userContext, IUserCollection? userCollection = null, IUserRegistration? userRegistration = null, IIdentifierRecursionChecker? identifierRecursionChecker = null, IIdentifierValidator? identifierValidator = null, ITokenGenerator? tokenGenerator = null)
+        public LoginController(UserContext? userContext, IUserCollection? userCollection = null, IUserRegistration? userRegistration = null, IIdentifierRecursionChecker? identifierRecursionChecker = null, IIdentifierValidator? identifierValidator = null, ITokenGenerator? tokenGenerator = null)
         {
             _userCollection = userCollection ?? IUserCollectionFactory.Get(userContext);
             _userRegistration = userRegistration ?? IUserRegistrationFactory.Get(userContext);
