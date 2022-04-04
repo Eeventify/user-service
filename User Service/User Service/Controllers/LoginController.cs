@@ -65,13 +65,7 @@ namespace User_Service.Controllers
 
             if (user != null && HashManager.CompareStringToHash(password, user.PasswordHash))
             {
-                string userKey = HashManager.GetHash(user.Username + user.PasswordHash);
-
-                Dictionary<string, object> data = new();
-                data.Add("userID", user.Id);
-                data.Add("key", userKey);
-
-                string authToken = _tokenGenerator.Create(data);
+                string authToken = GenerateAuthToken(user);
                 return Ok(authToken);
             } else
             {
@@ -120,14 +114,23 @@ namespace User_Service.Controllers
             }
 
             int userID = _userRegistration.AddUser(new UserDTO() { Username = user.Username, PasswordHash = HashManager.GetHash(user.Password), Email = user.Email });
-            string userKey = HashManager.GetHash(user.Username + HashManager.GetHash(user.Password));
+
+            UserDTO userDTO = _userCollection.GetUser(userID) ?? throw new Exception();
+
+            string authToken = GenerateAuthToken(userDTO);
+            return Ok(authToken);
+        }
+
+        // Helper Methods
+        private string GenerateAuthToken(UserDTO user)
+        {
+            string userKey = HashManager.GetHash(user.Username + user.PasswordHash);
 
             Dictionary<string, object> data = new();
-            data.Add("userID", userID);
+            data.Add("userID", user.Id);
             data.Add("key", userKey);
 
-            string authToken = _tokenGenerator.Create(data);
-            return Ok(authToken);
+            return _tokenGenerator.Create(data);
         }
     }
 }
