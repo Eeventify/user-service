@@ -53,7 +53,7 @@ namespace User_Service
         /// <exception cref="ArgumentNullException">A given argument was not valid</exception>
         /// <exception cref="TokenExpiredException">The given JWT has expired</exception>
         /// <exception cref="SignatureVerificationException">The given JWT has not been signed with the right signature</exception>
-        public object Decode(string token, params object[] parameters)
+        public Dictionary<string, object> Decode(string token, params object[] parameters)
         {
             if (string.IsNullOrEmpty(token))
             {
@@ -83,6 +83,10 @@ namespace User_Service
             catch (SignatureVerificationException)
             {
                 throw new SignatureVerificationException("Token has invalid signature");
+            }
+            catch (Exception ex)
+            {
+                throw new FormatException(ex.Message);
             }
         }
     }

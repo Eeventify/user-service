@@ -10,6 +10,6 @@ namespace Abstraction_Layer
     {
         public string Create(object payload, params object[] parameters);
 
-        public object Decode(string token, params object[] parameters);
+        public Dictionary<string, object> Decode(string token, params object[] parameters);
     }
 }

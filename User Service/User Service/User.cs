@@ -9,13 +9,19 @@ namespace User_Service
         public string Email { get; set; }
         public DateTime RegistrationDate { get; set; }
 
+        public List<int> Events { get; set; }
+        public List<int> Interests { get; set; }
 
-        public User(int id, string name, string email, DateTime registrationDate)
+
+        public User(int id, string name, string email, DateTime registrationDate, List<int> events, List<int> interests)
         {
             Id = id;
             Name = name;
             Email = email;
             RegistrationDate = registrationDate;
+
+            Events = events;
+            Interests = interests;
         }
 
         public User(UserDTO userDTO)
@@ -24,6 +30,9 @@ namespace User_Service
             Name = userDTO.Username;
             Email = userDTO.Email;
             RegistrationDate = userDTO.RegistrationDate;
+
+            Interests = userDTO.InterestIDs;
+            Events = userDTO.EventIDs;
         }
     }
 }
