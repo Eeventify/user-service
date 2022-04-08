@@ -127,7 +127,7 @@ namespace User_Service.Controllers
             string userKey = HashManager.GetHash(user.Username + user.PasswordHash);
 
             Dictionary<string, object> data = new();
-            data.Add("userID", user.Id);
+            data.Add("ID", user.Id);
             data.Add("key", userKey);
 
             return _tokenGenerator.Create(data);

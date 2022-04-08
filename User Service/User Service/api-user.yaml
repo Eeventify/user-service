@@ -81,35 +81,6 @@ paths:
           description: The account was created. An authentification token is returned in the body
         '202':
           description: An input is invalid or of the wrong format. What specific input will be given in the body
-  /Token/VerifyAuth:
-    get:
-      tags:
-        - Token
-      summary: Get User From Auth Token
-      description: "Get a user ID from a JWT Authentication token.\r\nThis API call is mainly meant for internal use"
-      parameters:
-        - name: token
-          in: query
-          description: JWT Authentication token for which to find a user ID
-          schema:
-            type: string
-      responses:
-        '200':
-          description: The token is valid and a matching User was found. The ID will be returned
-        '401':
-          description: Unauthorized
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-        '404':
-          description: An invalid token was given. A reason why will be given in the response body
   /User/Details:
     get:
       tags:
@@ -138,6 +109,158 @@ paths:
                 $ref: '#/components/schemas/User'
         '400':
           description: User with given ID was not found
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/User/AttendEvent/{ID}':
+    post:
+      tags:
+        - User
+      parameters:
+        - name: ID
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/User/UnattendEvent/{ID}':
+    delete:
+      tags:
+        - User
+      parameters:
+        - name: ID
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/User/AddInterest/{ID}':
+    post:
+      tags:
+        - User
+      parameters:
+        - name: ID
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/User/RemoveInterest/{ID}':
+    delete:
+      tags:
+        - User
+      parameters:
+        - name: ID
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
           content:
             text/plain:
               schema:
@@ -198,4 +321,16 @@ components:
         registrationDate:
           type: string
           format: date-time
+        events:
+          type: array
+          items:
+            type: integer
+            format: int32
+          nullable: true
+        interests:
+          type: array
+          items:
+            type: integer
+            format: int32
+          nullable: true
       additionalProperties: false

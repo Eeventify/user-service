@@ -9,7 +9,7 @@ namespace Factory_Layer
     {
         static public IUserCollection Get(DbContext context)
         {
-            return new UserEFDAL(context);
+            return new UserDAL(context);
         }
 
     }

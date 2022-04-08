@@ -13,7 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddDbContext<UserContext>(opt =>
 {
-    opt.UseSqlServer(builder.Configuration.GetConnectionString("UserContextLive"));
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("UserContext"));
 });
 
 
@@ -52,8 +52,6 @@ if (app.Environment.IsDevelopment())
     }
     catch { }
 }
-
-
 
 
 app.UseAuthorization();

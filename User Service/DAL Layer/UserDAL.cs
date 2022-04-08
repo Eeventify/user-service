@@ -7,11 +7,11 @@ using DTO_Layer;
 using DAL_Layer.Model;
 namespace DAL_Layer
 {    
-    public class UserEFDAL: IUserCollection, IUserRegistration, IIdentifierRecursionChecker
+    public class UserDAL: IUserCollection, IUserRegistration, IIdentifierRecursionChecker
     {
         private readonly UserContext _context;
 
-        public UserEFDAL(DbContext context)
+        public UserDAL(DbContext context)
         {
             _context = context as UserContext ?? throw new ArgumentNullException(nameof(context));
         }
@@ -20,15 +20,21 @@ namespace DAL_Layer
         {   
             userDTO.RegistrationDate = DateTime.Now;
 
-            _context.Users.Add(new User(userDTO));
+            User user = new User(userDTO);
+
+            _context.Users.Add(user);
             _context.SaveChanges();
 
-            return userDTO.Id;
+            return user.Id;
         }
 
         public UserDTO? GetUser(int Id)
         {
-            User? user = _context.Users.FirstOrDefault(x => x.Id == Id);
+            User? user = _context.Users
+                .Include(x => x.Events)
+                .Include(x => x.Interests)
+                .FirstOrDefault(x => x.Id == Id);
+
             if (user == null)
                 return null;
 
@@ -37,7 +43,11 @@ namespace DAL_Layer
 
         public UserDTO? GetUserByEmail(string email)
         {
-            User? user = _context.Users.FirstOrDefault(x => x.Email == email);
+            User? user = _context.Users
+                .Include(x => x.Events)
+                .Include(x => x.Interests)
+                .FirstOrDefault(x => x.Email == email);
+
             if (user == null)
                 return null;
 

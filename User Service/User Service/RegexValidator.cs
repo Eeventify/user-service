@@ -8,7 +8,7 @@ namespace User_Service
     {
         public bool Username(string username)
         {
-            Regex regex = new("^(?=.{4,50}$)[a-zA-Z0-9_\\-]+$");
+            Regex regex = new("^(?=.{4,50}$)[a-zA-Z0-9_.\\-]+$");
             return regex.IsMatch(username);
         }
 
