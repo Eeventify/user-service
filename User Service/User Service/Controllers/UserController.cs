@@ -204,7 +204,7 @@ namespace User_Service.Controllers
             {
                 int userID = IdentifyJWTToken(authHeader);
 
-                bool result = _userInterestCollection.AddUserInterest(userID, ID);
+                bool result = _userInterestCollection.RemoveUserInterest(userID, ID);
                 if (result)
                     return Ok("Interest has been removed");
                 else
