@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DAL_Layer.Migrations
 {
     [DbContext(typeof(UserContext))]
-    [Migration("20220408123252_ServerLiveEventInterestUpdate")]
-    partial class ServerLiveEventInterestUpdate
+    [Migration("20220422091042_Initial#5")]
+    partial class Initial5
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

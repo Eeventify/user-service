@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DAL_Layer.Migrations
 {
-    public partial class ServerLiveEventInterestUpdate : Migration
+    public partial class Initial5 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
