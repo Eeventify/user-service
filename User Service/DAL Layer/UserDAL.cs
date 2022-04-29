@@ -54,6 +54,21 @@ namespace DAL_Layer
             return user.ToDTO();
         }
 
+        public bool UpdateUser(UserDTO user)
+        {
+            User? _user = _context.Users.FirstOrDefault(x => x.Id == user.Id);
+
+            if (_user == null)
+                return false;
+
+            _user.Email = user.Email ?? _user.Email;
+            _user.ProfileImg = user.ProfileImg ?? _user.ProfileImg;
+            _user.Username = user.Username ?? _user.Username;
+
+            _context.Update(_user);
+            return _context.SaveChanges() > 0;
+        }
+
         public bool IsEmailUnique(string email)
         {
             return GetUserByEmail(email) == null;

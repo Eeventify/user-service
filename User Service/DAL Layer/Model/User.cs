@@ -19,6 +19,7 @@ namespace DAL_Layer.Model
             Email = userDTO.Email;
             PasswordHash = userDTO.PasswordHash;
             RegistrationDate = userDTO.RegistrationDate;
+            ProfileImg = userDTO.ProfileImg;
 
             List<UserEvent> _userEvents = new();
             foreach(int id in userDTO.EventIDs)
@@ -43,6 +44,7 @@ namespace DAL_Layer.Model
         public string Email { get; set; }
         public string PasswordHash { get; set; }
         public DateTime RegistrationDate { get; set; }
+        public string ProfileImg { get; set; }
 
         // Foreign Keys
 

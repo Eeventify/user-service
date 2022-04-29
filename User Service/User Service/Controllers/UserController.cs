@@ -308,6 +308,59 @@ namespace User_Service.Controllers
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="picture"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [Route("UpdateImage")]
+        public IActionResult? UpdateProfilePicture(string picture)
+        {
+            string? authHeader = Request.Headers.FirstOrDefault(x => x.Key == "Authorization").Value;
+
+            if (authHeader == null)
+                return Unauthorized("No authorization token was provided");
+
+            try
+            {
+                int userID = IdentifyJWTToken(authHeader);
+
+                UserDTO? userDTO = _userCollection.GetUser(userID);
+
+                if (userDTO == null)
+                    return BadRequest("This user account does not exist anymore");
+
+                userDTO.ProfileImg = picture;
+
+                bool state = _userCollection.UpdateUser(userDTO);
+
+                if (state)
+                    return Ok("Profile image changed");
+                else
+                    return BadRequest("Error: Something went wrong");
+            }
+            catch (TokenExpiredException ex)
+            {
+                return Unauthorized(ex);
+            }
+            catch (SignatureVerificationException ex)
+            {
+                return Unauthorized(ex);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return BadRequest(ex);
+            }
+            catch (FormatException ex)
+            {
+                return BadRequest("An error has occured:\n" + ex.Message);
+            }
+        }
+
         // Helper Methods
         private int IdentifyJWTToken(string token)
         {

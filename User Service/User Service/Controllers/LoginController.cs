@@ -14,6 +14,7 @@ namespace User_Service.Controllers
         public string Username { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
+        public string ProfileImg { get; set; }
     }
 #pragma warning restore 8618
 
@@ -113,13 +114,14 @@ namespace User_Service.Controllers
                 return Accepted("Username is already in use");
             }
 
-            int userID = _userRegistration.AddUser(new UserDTO() { Username = user.Username, PasswordHash = HashManager.GetHash(user.Password), Email = user.Email });
+            int userID = _userRegistration.AddUser(new UserDTO() { Username = user.Username, PasswordHash = HashManager.GetHash(user.Password), Email = user.Email, ProfileImg = user.ProfileImg });
 
             UserDTO userDTO = _userCollection.GetUser(userID) ?? throw new Exception();
 
             string authToken = GenerateAuthToken(userDTO);
             return Ok(authToken);
         }
+
 
         // Helper Methods
         private string GenerateAuthToken(UserDTO user)
