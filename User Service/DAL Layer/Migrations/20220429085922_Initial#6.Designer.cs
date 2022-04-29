@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DAL_Layer.Migrations
 {
     [DbContext(typeof(UserContext))]
-    [Migration("20220422091042_Initial#5")]
-    partial class Initial5
+    [Migration("20220429085922_Initial#6")]
+    partial class Initial6
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -37,6 +37,10 @@ namespace DAL_Layer.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProfileImg")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

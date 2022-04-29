@@ -12,5 +12,6 @@ namespace Abstraction_Layer
     {
         public UserDTO? GetUser(int Id);
         public UserDTO? GetUserByEmail(string email);
+        public bool UpdateUser(UserDTO user);
     }
 }

@@ -81,16 +81,17 @@ paths:
           description: The account was created. An authentification token is returned in the body
         '202':
           description: An input is invalid or of the wrong format. What specific input will be given in the body
-  /User/Details:
+  '/User/Details/{userID}':
     get:
       tags:
         - User
       summary: Get User Details
       description: Get user details based on a given user ID
       parameters:
-        - name: Id
-          in: query
+        - name: userID
+          in: path
           description: The ID of the user
+          required: true
           schema:
             type: integer
             format: int32
@@ -119,22 +120,68 @@ paths:
             text/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
-  '/User/AttendEvent/{ID}':
+  /User/Details:
+    get:
+      tags:
+        - User
+      summary: Get own User Details
+      description: Get user details based on the provided login token. Supplies information about the user that makes the request
+      responses:
+        '200':
+          description: User information is returned in Json format
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/User'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: The user profile could not be found
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: No authentication header was provided or the given token was invalid
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/User/AttendEvent/{eventID}':
     post:
       tags:
         - User
+      summary: Attend Event
+      description: Adds an event to the user's attending list. The user should be provided using the users authorization token in the authorization header
       parameters:
-        - name: ID
+        - name: eventID
           in: path
+          description: ID of the event the user is attending
           required: true
           schema:
             type: integer
             format: int32
       responses:
         '200':
-          description: Success
+          description: The event has been added or was already presetn. More information will be given in the reponse
         '400':
-          description: Bad Request
+          description: An error occured with the input. More information will be given in the reponse
           content:
             text/plain:
               schema:
@@ -146,7 +193,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
         '401':
-          description: Unauthorized
+          description: No token or an invalid authorization token was provided
           content:
             text/plain:
               schema:
@@ -157,22 +204,25 @@ paths:
             text/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
-  '/User/UnattendEvent/{ID}':
+  '/User/UnattendEvent/{eventID}':
     delete:
       tags:
         - User
+      summary: Unttend Event
+      description: Removes an event from the user's attending list. The user should be provided using the users authorization token in the authorization header
       parameters:
-        - name: ID
+        - name: eventID
           in: path
+          description: ID of the event the user is attending
           required: true
           schema:
             type: integer
             format: int32
       responses:
         '200':
-          description: Success
+          description: The event has been removed or was not attended. More information will be provided in the response
         '400':
-          description: Bad Request
+          description: An error occured with the input. More information will be given in the reponse
           content:
             text/plain:
               schema:
@@ -184,7 +234,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
         '401':
-          description: Unauthorized
+          description: No token or an invalid authorization token was provided
           content:
             text/plain:
               schema:
@@ -195,22 +245,25 @@ paths:
             text/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
-  '/User/AddInterest/{ID}':
+  '/User/AddInterest/{interestID}':
     post:
       tags:
         - User
+      summary: Add Interest
+      description: Adds an interest to the user's interest list. The user should be provided using the users authorization token in the authorization header
       parameters:
-        - name: ID
+        - name: interestID
           in: path
+          description: ID of the interest the user is adding
           required: true
           schema:
             type: integer
             format: int32
       responses:
         '200':
-          description: Success
+          description: The interest has been added or was already present. More information will be provided in the response
         '400':
-          description: Bad Request
+          description: An error occured with the input. More information will be given in the reponse
           content:
             text/plain:
               schema:
@@ -222,7 +275,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
         '401':
-          description: Unauthorized
+          description: No token or an invalid authorization token was provided
           content:
             text/plain:
               schema:
@@ -233,17 +286,58 @@ paths:
             text/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
-  '/User/RemoveInterest/{ID}':
+  '/User/RemoveInterest/{interestID}':
     delete:
       tags:
         - User
+      summary: Remove Interest
+      description: Removes an interest from the user's interest list. The user should be provided using the users authorization token in the authorization header
       parameters:
-        - name: ID
+        - name: interestID
           in: path
+          description: ID of the interest the user is removing
           required: true
           schema:
             type: integer
             format: int32
+      responses:
+        '200':
+          description: The interest has been removed or was never present. More information will be provided in the response
+        '400':
+          description: An error occured with the input. More information will be given in the reponse
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: No token or an invalid authorization token was provided
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /User/UpdateImage:
+    put:
+      tags:
+        - User
+      summary: ''
+      parameters:
+        - name: picture
+          in: query
+          description: ''
+          schema:
+            type: string
       responses:
         '200':
           description: Success
@@ -303,6 +397,9 @@ components:
           type: string
           nullable: true
         password:
+          type: string
+          nullable: true
+        profileImg:
           type: string
           nullable: true
       additionalProperties: false

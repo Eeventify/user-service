@@ -43,5 +43,6 @@ namespace User_Service.Mocks
         public int AddUser(UserDTO userDTO) => throw new System.NotImplementedException();
         public bool IsEmailUnique(string email) => throw new System.NotImplementedException();
         public bool IsUsernameUnique(string username) => throw new System.NotImplementedException();
+        public bool UpdateUser(UserDTO user) => throw new System.NotImplementedException();
     }
 }
