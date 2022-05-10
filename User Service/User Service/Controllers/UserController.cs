@@ -17,7 +17,8 @@ namespace User_Service.Controllers
         private readonly IUserCollection _userCollection;
         private readonly IUserEventCollection _userEventCollection;
         private readonly IUserInterestCollection _userInterestCollection;
-
+        private readonly IIdentifierRecursionChecker _identifierRecursionChecker;
+        private readonly IIdentifierValidator _identifierValidator;
         private readonly ITokenGenerator _tokenGenerator;
         
 
@@ -289,6 +290,169 @@ namespace User_Service.Controllers
                     return Ok("Interest has been removed");
                 else
                     return Ok("Interest was not selected");
+            }
+            catch (TokenExpiredException ex)
+            {
+                return Unauthorized(ex);
+            }
+            catch (SignatureVerificationException ex)
+            {
+                return Unauthorized(ex);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return BadRequest(ex);
+            }
+            catch (FormatException ex)
+            {
+                return BadRequest("An error has occured:\n" + ex.Message);
+            }
+        }
+
+
+        [HttpPut]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [Route("UpdateUsername")]
+        public IActionResult? UpdateUsername(string username)
+        {
+            string? authHeader = Request.Headers.FirstOrDefault(x => x.Key == "Authorization").Value;
+
+            if (authHeader == null)
+                return Unauthorized("No authorization token was provided");
+            if (!_identifierRecursionChecker.IsUsernameUnique(username))
+            {
+                return Accepted("Username is already in use");
+            }
+            if (!_identifierValidator.Username(username))
+            {
+                return Accepted("Username contains illegal characters");
+            }
+            try
+            {
+                int userID = IdentifyJWTToken(authHeader);
+
+                UserDTO? userDTO = _userCollection.GetUser(userID);
+
+                if (userDTO == null)
+                    return BadRequest("This user account does not exist anymore");
+
+                userDTO.Username = username;
+
+                bool state = _userCollection.UpdateUser(userDTO);
+
+                if (state)
+                    return Ok("Username changed");
+                else
+                    return BadRequest("Error: Something went wrong");
+            }
+            catch (TokenExpiredException ex)
+            {
+                return Unauthorized(ex);
+            }
+            catch (SignatureVerificationException ex)
+            {
+                return Unauthorized(ex);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return BadRequest(ex);
+            }
+            catch (FormatException ex)
+            {
+                return BadRequest("An error has occured:\n" + ex.Message);
+            }
+        }
+
+
+        [HttpPut]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [Route("UpdatePassword")]
+        public IActionResult? UpdateEmail(string password)
+        {
+            string? authHeader = Request.Headers.FirstOrDefault(x => x.Key == "Authorization").Value;
+
+            if (authHeader == null)
+                return Unauthorized("No authorization token was provided");
+            if (!_identifierValidator.Password(password))
+            {
+                return Accepted("Password contains illegal characters");
+            }
+            try
+            {
+                int userID = IdentifyJWTToken(authHeader);
+
+                UserDTO? userDTO = _userCollection.GetUser(userID);
+
+                if (userDTO == null)
+                    return BadRequest("This user account does not exist anymore");
+
+                userDTO.PasswordHash = HashManager.GetHash(password);
+
+                bool state = _userCollection.UpdateUser(userDTO);
+
+                if (state)
+                    return Ok("Password changed");
+                else
+                    return BadRequest("Error: Something went wrong");
+            }
+            catch (TokenExpiredException ex)
+            {
+                return Unauthorized(ex);
+            }
+            catch (SignatureVerificationException ex)
+            {
+                return Unauthorized(ex);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return BadRequest(ex);
+            }
+            catch (FormatException ex)
+            {
+                return BadRequest("An error has occured:\n" + ex.Message);
+            }
+        }
+
+        [HttpPut]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [Route("UpdateEmail")]
+        public IActionResult? UpdateEmail(string email)
+        {
+            string? authHeader = Request.Headers.FirstOrDefault(x => x.Key == "Authorization").Value;
+
+            if (authHeader == null)
+                return Unauthorized("No authorization token was provided");
+            if (!_identifierRecursionChecker.IsEmailUnique(password))
+            {
+                return Accepted("Email is already in use");
+            }
+            if (!_identifierValidator.Email(password))
+            {
+                return Accepted("Email contains illegal characters");
+            }
+            try
+            {
+                int userID = IdentifyJWTToken(authHeader);
+
+                UserDTO? userDTO = _userCollection.GetUser(userID);
+
+                if (userDTO == null)
+                    return BadRequest("This user account does not exist anymore");
+
+                userDTO.Email = password;
+
+                bool state = _userCollection.UpdateUser(userDTO);
+
+                if (state)
+                    return Ok("Email changed");
+                else
+                    return BadRequest("Error: Something went wrong");
             }
             catch (TokenExpiredException ex)
             {
