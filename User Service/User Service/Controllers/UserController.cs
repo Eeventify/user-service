@@ -371,7 +371,7 @@ namespace User_Service.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [Route("UpdatePassword")]
-        public IActionResult? UpdateEmail(string password)
+        public IActionResult? UpdatePassword(string password)
         {
             string? authHeader = Request.Headers.FirstOrDefault(x => x.Key == "Authorization").Value;
 
@@ -428,11 +428,11 @@ namespace User_Service.Controllers
 
             if (authHeader == null)
                 return Unauthorized("No authorization token was provided");
-            if (!_identifierRecursionChecker.IsEmailUnique(password))
+            if (!_identifierRecursionChecker.IsEmailUnique(email))
             {
                 return Accepted("Email is already in use");
             }
-            if (!_identifierValidator.Email(password))
+            if (!_identifierValidator.Email(email))
             {
                 return Accepted("Email contains illegal characters");
             }
@@ -445,7 +445,7 @@ namespace User_Service.Controllers
                 if (userDTO == null)
                     return BadRequest("This user account does not exist anymore");
 
-                userDTO.Email = password;
+                userDTO.Email = email;
 
                 bool state = _userCollection.UpdateUser(userDTO);
 
