@@ -75,7 +75,8 @@ namespace DAL_Layer.Model
                 PasswordHash = PasswordHash,
                 RegistrationDate = RegistrationDate,
                 EventIDs = _userEvents,
-                InterestIDs = _userInterests
+                InterestIDs = _userInterests,
+                ProfileImg = ProfileImg
             };
         }
     }

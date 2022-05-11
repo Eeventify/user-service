@@ -86,7 +86,7 @@ namespace User_Service.Controllers
                 if (userDTO == null)
                     return BadRequest("The user profile could not be found");
 
-                return Ok(userDTO);
+                return Ok(new User(userDTO));
             }
             catch (TokenExpiredException ex)
             {
