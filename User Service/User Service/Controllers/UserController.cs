@@ -17,20 +17,25 @@ namespace User_Service.Controllers
         private readonly IUserCollection _userCollection;
         private readonly IUserEventCollection _userEventCollection;
         private readonly IUserInterestCollection _userInterestCollection;
-        private readonly IIdentifierRecursionChecker _identifierRecursionChecker;
         private readonly IIdentifierValidator _identifierValidator;
+        private readonly IIdentifierRecursionChecker _identifierRecursionChecker;
         private readonly ITokenGenerator _tokenGenerator;
+
+        private readonly IHttpClientFactory? _httpClientFactory;
         
 
 
-        public UserController(UserContext context, IUserCollection? userCollection = null, ITokenGenerator? tokenGenerator = null, IUserEventCollection? userEventCollection = null, IUserInterestCollection? userInterestCollection = null)
+        public UserController(UserContext context, IUserCollection? userCollection = null, ITokenGenerator? tokenGenerator = null, IUserEventCollection? userEventCollection = null, IUserInterestCollection? userInterestCollection = null, IHttpClientFactory? httpClientFactory = null)
         {
             _userCollection = userCollection ?? IUserCollectionFactory.Get(context);
             _userEventCollection = userEventCollection ?? IUserEventCollectionFactory.Get(context);
             _userInterestCollection = userInterestCollection ?? IUserInterestCollectionFactory.Get(context);
-
-            _tokenGenerator = tokenGenerator ?? new JWTGenerator("letmein", TimeSpan.FromDays(14).TotalSeconds);
+            _identifierRecursionChecker = IIdentifierRecursionCheckerFactory.Get(context);
             
+            
+            _tokenGenerator = tokenGenerator ?? new JWTGenerator("letmein", TimeSpan.FromDays(14).TotalSeconds);
+            _identifierValidator = new RegexValidator();
+            _httpClientFactory = httpClientFactory;
         }
 
         /// <summary>
@@ -123,7 +128,7 @@ namespace User_Service.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]        
         [Route("AttendEvent/{eventID}")]
-        public IActionResult? AttendEvent(int eventID)
+        public async Task<IActionResult?> AttendEvent(int eventID)
         {
             string? authHeader = Request.Headers.FirstOrDefault(x => x.Key == "Authorization").Value;
 
@@ -136,7 +141,21 @@ namespace User_Service.Controllers
 
                 bool result = _userEventCollection.AttendEvent(userID, eventID);
                 if (result)
+                {
+                    if (_httpClientFactory != null)
+                    {
+                        try { 
+                        HttpClient httpClient = _httpClientFactory.CreateClient("EventService");
+                        var httpResponseMessage = await httpClient.PutAsync($"/Member/{eventID}/Attend?userID={userID}", null);
+                        Console.WriteLine(httpResponseMessage.StatusCode);
+                        }
+                        catch
+                        {
+                            Console.WriteLine("Connection to Event Service could not be made, is the service down?");
+                        }
+                    }
                     return Ok("Event has been attended");
+                }
                 else
                     return Ok("Event was already attended");
             } 
@@ -173,7 +192,7 @@ namespace User_Service.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [Route("UnattendEvent/{eventID}")]
-        public IActionResult? UnattendEvent(int eventID)
+        public async Task<IActionResult?> UnattendEvent(int eventID)
         {
             string? authHeader = Request.Headers.FirstOrDefault(x => x.Key == "Authorization").Value;
 
@@ -186,7 +205,21 @@ namespace User_Service.Controllers
 
                 bool result = _userEventCollection.UnattendEvent(userID, eventID);
                 if (result)
+                {
+                    if (_httpClientFactory != null)
+                    {
+                        try
+                        {
+                            HttpClient httpClient = _httpClientFactory.CreateClient("EventService");
+                            var httpResponseMessage = await httpClient.PutAsync($"/Member/{eventID}/Unattend?userID={userID}", null);
+                            Console.WriteLine(httpResponseMessage.StatusCode);
+                        } catch
+                        {
+                            Console.WriteLine("Connection to Event Service could not be made, is the service down?");
+                        }
+                    }
                     return Ok("Event has been unattended");
+                }
                 else
                     return Ok("Event was never attended");
             }
