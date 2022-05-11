@@ -13,10 +13,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddDbContext<UserContext>(opt =>
 {
-    opt.UseSqlServer(builder.Configuration.GetConnectionString("UserContextLive"));
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("UserContext"));
 });
 
-
+// Configure HTTP Clients
+builder.Services.AddHttpClient("EventService", httpClient =>
+{
+    httpClient.BaseAddress = new Uri(builder.Configuration.GetValue<string>("APIS:Event"));
+    httpClient.Timeout = TimeSpan.FromMilliseconds(2000);
+});
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
