@@ -16,12 +16,27 @@ builder.Services.AddDbContext<UserContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("UserContext"));
 });
 
+
 // Configure HTTP Clients
 builder.Services.AddHttpClient("EventService", httpClient =>
 {
     httpClient.BaseAddress = new Uri(builder.Configuration.GetValue<string>("APIS:Event"));
     httpClient.Timeout = TimeSpan.FromMilliseconds(2000);
 });
+
+// CORS Configuration
+builder.Services.AddCors(opt =>
+{
+    opt.AddDefaultPolicy(builder =>
+    {
+        builder
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -62,5 +77,7 @@ if (app.Environment.IsDevelopment())
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseCors();
 
 app.Run();
